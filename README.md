@@ -178,9 +178,5 @@ class Page extends Component<IPage> {
 ```
 class Order extends Form<IOrder> {
     constructor(container: HTMLFormElement, events: IEvents) 
-
-    set phone(value: string)
-
-    set email(value: string) 
 }
 ```
