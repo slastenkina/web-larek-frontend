@@ -47,8 +47,7 @@ yarn build
 
 ## Описание данных
 
-Описание товара:
-
+Описание товара
 ```
 interface IProduct {
 	id: string;
@@ -60,8 +59,7 @@ interface IProduct {
 }
 ```
 
-Список товаров в корзине и итоговая стоимость:
-
+Список товаров в корзине и итоговая стоимость
 ```
 interface IBasket {
 	items: IProduct[];
@@ -69,14 +67,12 @@ interface IBasket {
 }
 ```
 
-Способы оплаты:
-
+Способы оплаты
 ```
 type TPaymentMethod = 'cash' | 'card';
 ```
 
-Описание заказа:
-
+Описание заказа
 ```
 interface IOrder {
 	items: IProduct[];
@@ -87,18 +83,25 @@ interface IOrder {
 }
 ```
 
-Типы ошибок при валидации форм:
-
+Типы ошибок при валидации форм
 ```
 type FormErrors = Partial<Record<keyof IOrder, string>>;
 ```
 
-Идентификатор заказа и сумма:
-
+Идентификатор заказа и сумма
 ```
 interface IOrderResult {
 	id: string;
 	total: number;
+}
+```
+
+Главная страница
+```
+interface IPage {
+    counter: number;
+    catalog: HTMLElement[];
+    locked: boolean;
 }
 ```
 
@@ -112,5 +115,72 @@ abstract class Model<T> {
 
     // Сообщить всем что модель поменялась
     emitChanges(event: string, payload?: object) {}
+}
+```
+
+## Классы представления
+
+Базовый компонент
+
+```
+abstract class Component<T> {
+    protected constructor(protected readonly container: HTMLElement) {
+        // Код в конструкторе исполняется ДО всех объявлений в дочернем классе
+    }
+
+    // Инструментарий для работы с DOM в дочерних компонентах
+
+    // Переключить класс
+    toggleClass(element: HTMLElement, className: string, force?: boolean): void;
+
+    // Установить текстовое содержимое
+    protected setText(element: HTMLElement, value: string): void;
+
+    // Сменить статус блокировки
+    setDisabled(element: HTMLElement, state: boolean): void;
+
+    // Скрыть
+    protected setHidden(element: HTMLElement): void;
+
+    // Показать
+    protected setVisible(element: HTMLElement): void;
+
+    // Установить изображение с алтернативным текстом
+    protected setImage(element: HTMLImageElement, src: string, alt?: string): void;
+
+    // Вернуть корневой DOM-элемент
+    render(data?: Partial<T>): HTMLElement
+}
+```
+
+Класс главной страницы
+```
+class Page extends Component<IPage> {
+    //Внутренние элементы
+    protected _counter: HTMLElement;
+    protected _catalog: HTMLElement;
+    protected _wrapper: HTMLElement;
+    protected _basket: HTMLElement;
+
+    constructor(container: HTMLElement, protected events: IEvents)
+    //сеттер для счётчика товаров в корзине
+    set counter(value: number) 
+
+    //сеттер для товаров на странице
+    set catalog(items: HTMLElement[]) 
+
+    //сеттер для блока прокрутки
+    set locked(value: boolean)
+}
+```
+
+Класс формы заказа
+```
+class Order extends Form<IOrder> {
+    constructor(container: HTMLFormElement, events: IEvents) 
+
+    set phone(value: string)
+
+    set email(value: string) 
 }
 ```
