@@ -45,138 +45,131 @@ npm run build
 yarn build
 ```
 
-## Описание данных
+## Архитектура
 
-Описание товара
-```
-interface IProduct {
-	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number | null;
-}
-```
+Архитектура проекта построена на принципе MVP (Model-View-Presenter).
 
-Список товаров в корзине и итоговая стоимость
-```
-interface IBasket {
-	items: IProduct[];
-	total: number;
-}
-```
+Model - слой, который работает только с данными приложения, 
+View - слой, который только отображает эти данные на экране.
+Presenter - между собой эти слои взаимодействуют через методы посредника.
 
-Способы оплаты
-```
-type TPaymentMethod = 'cash' | 'card';
-```
+## Базовые классы
 
-Описание заказа
-```
-interface IOrder {
-	items: IProduct[];
-	payment: PaymentMethod;
-	address: string;
-	email: string;
-	phone: string;
-}
-```
+### Класс Api
+Класс обеспечивает обмен данными с сервером.
+*Методы:*
+- 'get' -  метод для получения данных с сервера
+- 'post' - метод отправки данных на сервер
 
-Типы ошибок при валидации форм
-```
-type FormErrors = Partial<Record<keyof IOrder, string>>;
-```
+### Класс EventEmitter
+Брокер событий, позволяет подписываться на события или слушать события. Используется в презентере для обработки.
+*Методы:*
+- 'on' - подписаться на событие
+- 'off' - отписаться от события
+- 'emit' - инициировать событие
+- 'onAll' - подписаться на все события
+- 'offAll' - cбросить все обработчики
+- 'trigger' - коллбек триггер, генерирующий событие при вызове
 
-Идентификатор заказа и сумма
-```
-interface IOrderResult {
-	id: string;
-	total: number;
-}
-```
+### Класс Component
+Абстрактный класс для наследования отображения, в котором содержатся общие для всех классов слоя представления методы.
+*Методы:*
+- 'render' - вернуть корневой DOM-элемент
+- 'toggleClass' - переключить CSS-класс элемента
+- 'setText' - установить текстовое содержимое
+- 'setDisabled' - установить статус блокировки 'Disabled'
+- 'setHidden' - скрыть элемент
+- 'setVisible' - показать элемент
+- 'setImage' - установить изображение с алтернативным текстом
 
-Главная страница
-```
-interface IPage {
-    counter: number;
-    catalog: HTMLElement[];
-    locked: boolean;
-}
-```
+### Класс Model 
+Абстрактный класс для компонентов модели данных. 
+*Методы:*
+- 'emitChanges' - сообщить об изменении внутренних данных используя EventEmitter
 
-## Модели данных
+## Слой данных
 
-Базовая модель, чтобы можно было отличить ее от простых объектов с данными
+### Класс AppState
+Модель данных приложения. Расширяет базовый класс Model, который принимает интерфейс IAppState. Содержит данные о корзине, каталоге товаров, заказе, прдпросмотре товара, ошибках формы.
+Реализует методы упраления этими данными.
+*Поля:*
+- 'basket'
+- 'catalog'
+- 'order'
+- 'preview'
+- 'formErrors'
 
-```
-abstract class Model<T> {
-    constructor(data: Partial<T>, protected events: IEvents) {}
+## Слой представления
 
-    // Сообщить всем что модель поменялась
-    emitChanges(event: string, payload?: object) {}
-}
-```
+### Класс Modal
+Класс представления модального окна.
+Универсальный контейнер. В этом элементе размещается разметка, соответствующая любому контенту в проекте, который надо разместить в модальном окне: контенту информации об одном товаре, контенту корзины, контенту форм оформления заказа, контенту окна с сообщением об успешном оформлении заказа. Каждому контенту соответствует шаблон (template), присутствующий в файле index.html.
+'content' - передаётся методу render класса Modal как параметр.
+*Методы:*
+- 'render' - обновляет состояние молального окна
+- 'open' - открывает модальное окно
+- 'close' - закрывает модальное окно
 
-## Классы представления
+### Класс Page
+Класс представления главной страницы. Содержит поля: 
+- 'counter' - счётчик товаров в корзине
+- 'catalog' - каталог 
+- 'wrapper' - обёртка страницы, которая позволяет блокировать прокрутку страницы
+- 'basket' - корзина
 
-Базовый компонент
+### Класс Basket
+Класс представления корзины.
+Содержит поля:
+- 'list' - список товаров в корзине
+- 'total' - общая стоимость товаров в окрзине
+- 'button' - кнопка оформления заказа
 
-```
-abstract class Component<T> {
-    protected constructor(protected readonly container: HTMLElement) {
-        // Код в конструкторе исполняется ДО всех объявлений в дочернем классе
-    }
+### Класс Card
+Класс представления карточки товара.
+Содржит поля:
+- 'title' - название товара
+- 'image' - изображение товара
+- 'description' - описание товара
+- 'button' - кнопка карточки товара
+- 'price' - цена товара
+- 'category' - категория товара
 
-    // Инструментарий для работы с DOM в дочерних компонентах
+### Класс Form
+Класс представления формы, абстрактный класс. Обеспечивает взаимодействие с формой.
+Содержит поля: 
+- 'submit' - кнопка отправки формы
+- 'errors' - отоюражение ошибок валидации
+*Методы:*
+- 'onInputChange' - обрабатывает событие ввода данных в поля формы 
+- 'render' - обновляет состоние формы 
 
-    // Переключить класс
-    toggleClass(element: HTMLElement, className: string, force?: boolean): void;
+### Класс OrderPayment
+Расширяет класс Form. Соответствует форме с вводом адреса доставки.
+Свойства:
+- 'payment'
+- 'address'
 
-    // Установить текстовое содержимое
-    protected setText(element: HTMLElement, value: string): void;
+### Класс OrderContacts
+Расширяет класс Form. Соответствует форме с контактными данными.
+Свойства:
+- 'email'
+- 'phone'
 
-    // Сменить статус блокировки
-    setDisabled(element: HTMLElement, state: boolean): void;
+### Класс Success
+Отображает сообщение об успешном оформлении заказа.
+Свойства: 
+- 'total' - общая сумма заказа
 
-    // Скрыть
-    protected setHidden(element: HTMLElement): void;
+## Слой презентера
+Код презентера будет реализован в файле src/index.ts 
 
-    // Показать
-    protected setVisible(element: HTMLElement): void;
-
-    // Установить изображение с алтернативным текстом
-    protected setImage(element: HTMLImageElement, src: string, alt?: string): void;
-
-    // Вернуть корневой DOM-элемент
-    render(data?: Partial<T>): HTMLElement
-}
-```
-
-Класс главной страницы
-```
-class Page extends Component<IPage> {
-    //Внутренние элементы
-    protected _counter: HTMLElement;
-    protected _catalog: HTMLElement;
-    protected _wrapper: HTMLElement;
-    protected _basket: HTMLElement;
-
-    constructor(container: HTMLElement, protected events: IEvents)
-    //сеттер для счётчика товаров в корзине
-    set counter(value: number) 
-
-    //сеттер для товаров на странице
-    set catalog(items: HTMLElement[]) 
-
-    //сеттер для блока прокрутки
-    set locked(value: boolean)
-}
-```
-
-Класс формы заказа
-```
-class Order extends Form<IOrder> {
-    constructor(container: HTMLFormElement, events: IEvents) 
-}
-```
+*События:*
+- 'items:changed'- изменились элементы каталога
+- 'order:submit' - отправлена форма заказа
+- 'formErrors:change' - изменилось состояние валидации формы
+- 'order:open' - открыть форму заказа
+- 'basket:open' - открыть корзину
+- 'card:select' - открыть карточку для просмотра подробной информации
+- 'preview:changed' - изменена открытая выбранная карточка
+- 'modal:open' - открытие модального окна, блокировка прокрутки страницы
+- 'modal:close' - закрытие модального окна, разблокировка прокрутки
