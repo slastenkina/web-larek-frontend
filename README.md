@@ -191,7 +191,7 @@ yarn build
 	title: string; - заголовок
 	category: string; - категория товара
 	price: number | null; - цена товара
-
+	
 `interface IAppState` - интерфейс приложения
 	catalog: ICard[]; - каталог с товарами
 	preview: string | null; - превью товара
