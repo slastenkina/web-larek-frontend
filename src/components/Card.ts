@@ -86,7 +86,11 @@ export class Card extends Component<ICard> {
 
 	set category(value: string) {
 		this.setText(this._category, value);
-		this.toggleClass(this._category, categories.get(value), true);
+
+		this._category.className = '';
+		const className = `card__category`;
+		const categoryClassName = categories.get(value);
+		this._category.classList.add(className, `${className}${categoryClassName}`)
 	}
 
 	get category() {
@@ -109,6 +113,7 @@ export class BasketItem extends Component<BasketItem> {
 		super(container);
 
 		this._index = ensureElement<HTMLElement>('.basket__item-index', container);
+		this.setText(this._index, index + 1);
 		this._title = ensureElement<HTMLElement>('.card__title', container);
 		this._price = ensureElement<HTMLElement>('.card__price', container);
 		this._button = container.querySelector('.card__button');

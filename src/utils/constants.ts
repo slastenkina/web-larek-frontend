@@ -6,9 +6,9 @@ export const settings = {
 };
 
 export const categories = new Map([
-	['софт-скилл', 'card__category_soft'],
-	['хард-скилл', 'card__category_hard'],
-	['другое', 'card__category_other'],
-	['дополнительное', 'card__category_additional'],
-	['кнопка', 'card__category_button'],
+	['софт-скил', '_soft'],
+	['хард-скил', '_hard'],
+	['другое', '_other'],
+	['дополнительное', '_additional'],
+	['кнопка', '_button'],
 ]);

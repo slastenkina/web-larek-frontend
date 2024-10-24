@@ -28,10 +28,6 @@ export class Basket extends Component<IBasketView> {
 		this.items = [];
 	}
 
-	disableButton(value: string) {
-		this._button.setAttribute('disabled', value);
-	}
-
 	set items(items: HTMLElement[]) {
 		if (items.length) {
 			this._list.replaceChildren(...items);
@@ -42,11 +38,16 @@ export class Basket extends Component<IBasketView> {
 					textContent: 'Корзина пуста',
 				})
 			);
-			this.disableButton('true');
+			this.setDisabled(this._button, true);
 		}
 	}
 
 	set total(total: number) {
+		if (!total.valueOf()) {
+			this.setDisabled(this._button, true);
+			this.setText(this._total, '0 синапсов');
+		} else {
 		this.setText(this._total, `${total.toString()}` + ' синапсов');
+		}
 	}
 }
